@@ -58,8 +58,26 @@ public async Task<IActionResult> UpvoteAsync(int postId)
             return Ok(new { message = "Downvoted successfully", downvotes = post.Downvote });
         }
 
+        [HttpPost]
+        public IActionResult Post([FromBody] string error)
+        {
+            error = "Unexpected Error Ocured On The Server";
+            try
+            {
+                return error;
+            }
+            catch (Exception e)
+            {
+                LogException(e);
+                return StatusCode(500);
+            }
+        }
 
-    
+        private void LogException(Exception e)
+        {
+            throw new NotImplementedException();
+        }
+
 
         // GET: api/Posts1/5
         [HttpGet("{id}")]

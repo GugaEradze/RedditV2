@@ -1,9 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using Middleware.Example;
 using Reddit;
 using Reddit.Repositories;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 builder.Services.AddControllers()
      .AddJsonOptions(options =>
@@ -36,6 +40,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.Use(async (context, next) =>
+{
+    var cultureQuery = context.Request.Query["culture"];
+    if (!string.IsNullOrWhiteSpace(cultureQuery))
+    {
+        var culture = new CultureInfo(cultureQuery);
+
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+    }
+
+    await next(context);
+});
+
+app.UseRequestCulture();
 
 app.UseHttpsRedirection();
 
